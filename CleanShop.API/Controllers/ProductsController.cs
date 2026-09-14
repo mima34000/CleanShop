@@ -22,9 +22,8 @@ public class ProductsController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetAll()
-    {
-        // Skickar queryn vidare
-
+    { 
+        // Hämtar hela listan
         var result = await _mediator.Send(new GetAllProductsQuery());
         return Ok(result);
     }
@@ -43,18 +42,18 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create(CreateProductCommand command)
+    public async Task<ActionResult<ProductDto>> Create(CreateProductCommand command)
     {
-        // Kör igång command
+        // Skapar och returnerar DTO
 
-        var id = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id }, id);
+        var result = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateProductCommand command)
     {
-        // Matcha id först
+        // Kolla om id matchar
 
         if (id != command.Id)
         {

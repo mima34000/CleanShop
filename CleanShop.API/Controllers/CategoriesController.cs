@@ -20,9 +20,9 @@ public class CategoriesController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<List<CategoryDto>>> GetAll()
-    {
-        // Skickar queryn vidare
 
+    // Hämtar alla kategorier
+    {
         var result = await _mediator.Send(new GetAllCategoriesQuery());
         return Ok(result);
     }
@@ -41,11 +41,12 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create(CreateCategoryCommand command)
-    {
-        // Kör igång command
+    public async Task<ActionResult<CategoryDto>> Create(CreateCategoryCommand command)
 
-        var id = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id }, id);
+    // Skapar och skickar DTO
+
+    {
+        var result = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 }
