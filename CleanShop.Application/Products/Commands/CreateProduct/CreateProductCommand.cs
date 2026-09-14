@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using CleanShop.Application.Products.Dtos;
+using MediatR;
 
 namespace CleanShop.Application.Products.Commands.CreateProduct;
 
-public class CreateProductCommand : IRequest<int>
+public class CreateProductCommand : IRequest<ProductDto>
 {
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }

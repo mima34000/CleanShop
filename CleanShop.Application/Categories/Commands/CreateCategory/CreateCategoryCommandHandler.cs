@@ -1,10 +1,11 @@
-﻿using CleanShop.Domain.Entities;
+﻿using CleanShop.Application.Categories.Dtos;
+using CleanShop.Domain.Entities;
 using CleanShop.Domain.Interfaces;
 using MediatR;
 
 namespace CleanShop.Application.Categories.Commands.CreateCategory;
 
-public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, int>
+public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, CategoryDto>
 {
     private readonly ICategoryRepository _categoryRepository;
 
@@ -12,11 +13,10 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
     {
         _categoryRepository = categoryRepository;
     }
-    // Skapar kategori
-    public async Task<int> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
-    {
-        // Skapar nytt objekt
 
+    // Skapar och returnerar DTO
+    public async Task<CategoryDto> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    {
         var category = new Category
         {
             Name = request.Name
@@ -27,8 +27,12 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
         await _categoryRepository.AddAsync(category);
         await _categoryRepository.SaveChangesAsync();
 
-        // Returnerar det nya id-t
+        // Mappar om till DTO
 
-        return category.Id;
+        return new CategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name
+        };
     }
 }

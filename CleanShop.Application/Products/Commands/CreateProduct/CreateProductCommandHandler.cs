@@ -1,10 +1,11 @@
-﻿using CleanShop.Domain.Entities;
+﻿using CleanShop.Application.Products.Dtos;
+using CleanShop.Domain.Entities;
 using CleanShop.Domain.Interfaces;
 using MediatR;
 
 namespace CleanShop.Application.Products.Commands.CreateProduct;
 
-public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, int>
+public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, ProductDto>
 {
     private readonly IProductRepository _productRepository;
     private readonly ICategoryRepository _categoryRepository;
@@ -15,10 +16,10 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<int> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<ProductDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        var categoryExists = await _categoryRepository.ExistsAsync(request.CategoryId);
-        if (!categoryExists)
+        var category = await _categoryRepository.GetByIdAsync(request.CategoryId);
+        if (category is null)
         {
             throw new KeyNotFoundException($"Category with id {request.CategoryId} was not found.");
         }
@@ -34,6 +35,14 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         await _productRepository.AddAsync(product);
         await _productRepository.SaveChangesAsync();
 
-        return product.Id;
+        return new ProductDto
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            Stock = product.Stock,
+            CategoryId = product.CategoryId,
+            CategoryName = category.Name
+        };
     }
 }
